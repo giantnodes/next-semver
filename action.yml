@@ -1,0 +1,32 @@
+name: ''
+description: ''
+author: ''
+
+inputs:
+  version:
+    description: 'a version to increment'
+    required: true
+  type:
+    type: choice
+    description: 'a sermver release type'
+    default: 'canary'
+    required: true
+    options:
+      - prerelease
+      - prepatch
+      - patch
+      - preminor
+      - minor
+      - premajor
+      - major
+  identifier:
+    required: false
+    description: 'an identifier to be used to prefix version increment'
+
+outputs:
+  version:
+    description: 'the incremented version'
+
+runs:
+  using: node20
+  main: dist/index.js

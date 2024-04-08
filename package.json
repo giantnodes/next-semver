@@ -1,0 +1,47 @@
+{
+  "name": "@giantnodes/next-semver",
+  "version": "0.0.0",
+  "description": "A Github action to increment a semver",
+  "license": "MIT",
+  "packageManager": "pnpm@8.7.0",
+  "author": {
+    "name": "Jordan Phillips",
+    "email": "jordan@giantnodes.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com/giantnodes/next-semver.git"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup src",
+    "---": "",
+    "lint:eslint": "eslint src",
+    "lint:prettier": "pretty-quick 'src/**/*.{cjs,js,jsx,mjs,ts,tsx,json,md,mdx,css,html,yml,yaml,scss}'",
+    "lint:fix": "pnpm run lint:eslint --fix && pnpm run lint:prettier --write",
+    "lint": "pnpm run lint:prettier && pnpm run lint:eslint",
+    "--": ""
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "semver": "^7.6.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.2.1",
+    "@commitlint/config-conventional": "^19.1.0",
+    "@types/semver": "^7.5.8",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "husky": "^9.0.11",
+    "prettier": "^3.2.5",
+    "pretty-quick": "^4.0.0",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.4"
+  }
+}
