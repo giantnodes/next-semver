@@ -3,21 +3,22 @@
   "env": {
     "browser": false,
     "es2021": true,
-    "node": true,
+    "node": true
   },
   "parser": "@typescript-eslint/parser",
-  "extends": ["airbnb-base", "airbnb-typescript", "prettier"],
+  "extends": ["airbnb-base", "airbnb-typescript/base", "prettier"],
   "parserOptions": {
     "project": "tsconfig.json",
     "ecmaFeatures": {
-      "jsx": true,
+      "jsx": true
     },
     "ecmaVersion": 12,
-    "sourceType": "module",
+    "sourceType": "module"
   },
   "rules": {
     "@typescript-eslint/consistent-type-imports": "error",
     "no-console": "warn",
+    "import/prefer-default-export": "off",
     "import/extensions": "off",
     "import/order": [
       "error",
@@ -27,19 +28,19 @@
           {
             "pattern": "~/**",
             "group": "external",
-            "position": "after",
-          },
+            "position": "after"
+          }
         ],
         "newlines-between": "always",
-        "alphabetize": { "order": "asc", "caseInsensitive": true },
-      },
+        "alphabetize": { "order": "asc", "caseInsensitive": true }
+      }
     ],
     "sort-imports": [
       "error",
       {
         "ignoreDeclarationSort": true,
-        "ignoreMemberSort": false,
-      },
+        "ignoreMemberSort": false
+      }
     ],
     "padding-line-between-statements": [
       "warn",
@@ -48,8 +49,8 @@
       {
         "blankLine": "any",
         "prev": ["const", "let", "var"],
-        "next": ["const", "let", "var"],
-      },
-    ],
-  },
+        "next": ["const", "let", "var"]
+      }
+    ]
+  }
 }
