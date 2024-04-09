@@ -23,11 +23,11 @@ jobs:
       - name: '💽️  Init'
         uses: ./.github/actions/init
 
-      - name: '📦  Install'
-        uses: ./.github/actions/install
-
       - name: '🔺️  Cache'
         uses: ./.github/actions/cache
+
+      - name: '📦  Install'
+        uses: ./.github/actions/install
 
       - name: '🏗️  Build'
         uses: ./.github/actions/build
