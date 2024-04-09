@@ -9,6 +9,13 @@ let failed: jest.SpiedFunction<typeof core.setFailed>
 let output: jest.SpiedFunction<typeof core.setOutput>
 let inc: jest.SpiedFunction<typeof semver.inc>
 
+jest.mock('@actions/core', () => ({
+  getInput: jest.fn(),
+  setFailed: jest.fn(),
+  setOutput: jest.fn(),
+  info: jest.fn()
+}))
+
 describe('action', () => {
   beforeEach(() => {
     jest.clearAllMocks()
