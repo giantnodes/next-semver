@@ -1,0 +1,15 @@
+name: '🧪  '
+author: 'PHILLIPS71'
+
+inputs:
+  COMMAND:
+    default: 'test'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: '🧪  Test'
+      shell: bash
+      run: |
+        pnpm run ${{ inputs.COMMAND }}

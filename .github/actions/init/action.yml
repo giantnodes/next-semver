@@ -1,0 +1,27 @@
+name: '💽️  '
+author: 'PHILLIPS71'
+
+inputs:
+  node-version:
+    default: '20'
+    description: '🔢  Node version'
+    required: true
+  pnpm-version:
+    default: '8'
+    description: '🔢  pnpm version'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: '🔧  pnpm'
+      uses: pnpm/action-setup@v3
+      with:
+        version: ${{ inputs.pnpm-version }}
+
+    - name: '💽️  Node ${{ inputs.node-version }}'
+      uses: actions/setup-node@v4
+      with:
+        cache-dependency-path: pnpm-lock.yaml
+        cache: 'pnpm'
+        node-version: ${{ inputs.node-version }}

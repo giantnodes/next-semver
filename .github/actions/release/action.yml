@@ -1,0 +1,19 @@
+name: '🏷️  '
+author: 'PHILLIPS71'
+
+inputs:
+  GH_TOKEN:
+    required: true
+  NPM_TOKEN:
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: '🏷️  Release'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+        NPM_TOKEN: ${{ inputs.NPM_TOKEN }}
+      run: |
+        pnpm run semantic-release

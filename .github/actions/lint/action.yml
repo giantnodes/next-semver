@@ -1,0 +1,10 @@
+name: '🚨️  '
+author: 'PHILLIPS71'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: '🚨️  Lint'
+      shell: bash
+      run: |
+        pnpm run lint

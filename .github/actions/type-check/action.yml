@@ -1,0 +1,15 @@
+name: '🦺  '
+author: 'PHILLIPS71'
+
+inputs:
+  COMMAND:
+    default: 'type-check'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: '🦺  Type Check'
+      shell: bash
+      run: |
+        pnpm run ${{ inputs.COMMAND }}

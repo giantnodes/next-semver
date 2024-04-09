@@ -1,0 +1,33 @@
+name: '🔀️  Release'
+
+on:
+  workflow_dispatch:
+    inputs:
+      increment:
+        type: choice
+        description: 'SemVer Increment'
+        default: 'canary'
+        required: true
+        options:
+          - prerelease
+          - patch
+          - minor
+          - major
+
+jobs:
+  stage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: '🐙️  Checkout'
+        uses: actions/checkout@v4
+
+      - name: '💽️  Init'
+        uses: ./.github/actions/init
+
+      # increment version in a version.txt file
+
+      # create a commit with version.txt, package.json and tagged commit
+
+      # create release pr to main
+
+      # auto merge?

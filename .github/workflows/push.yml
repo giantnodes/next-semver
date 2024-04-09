@@ -1,0 +1,48 @@
+name: '🔀️  Push'
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: push-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  push:
+    name: '👷️  CI'
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: '🐙️  Checkout'
+        uses: actions/checkout@v4
+
+      - name: '💽️  Init'
+        uses: ./.github/actions/init
+
+      - name: '📦  Install'
+        uses: ./.github/actions/install
+
+      - name: '🔺️  Cache (turbo)'
+        uses: ./.github/actions/cache
+
+      - name: '🏗️  Build'
+        uses: ./.github/actions/build
+        with:
+          COMMAND: 'build'
+
+      - name: '🚨️  Lint'
+        uses: ./.github/actions/lint
+
+      - name: '🦺  Type Check'
+        uses: ./.github/actions/type-check
+        with:
+          COMMAND: 'type-check'
+
+      - name: '🧪  Test'
+        uses: ./.github/actions/test
+        with:
+          COMMAND: 'test'
