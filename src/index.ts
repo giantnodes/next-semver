@@ -23,7 +23,7 @@ export const run = async () => {
     }
 
     const version = (await fs.promises.readFile(path, 'utf-8')).trim()
-    const output = semver.inc(version, type, identifier)
+    const output = semver.inc(version, type, identifier, '1')
 
     if (output == null) {
       core.setFailed(`'${version}' is not a valid version number`)

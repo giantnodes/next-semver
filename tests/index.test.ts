@@ -60,7 +60,7 @@ describe('action', () => {
     await run()
 
     // assert
-    expect(output).toHaveBeenCalledWith('version', '1.0.1-canary.0')
+    expect(output).toHaveBeenCalledWith('version', '1.0.1-canary.1')
   })
 
   test('writes incremented version to version file', async () => {
