@@ -3,13 +3,13 @@ description: ''
 author: ''
 
 inputs:
-  version:
-    description: 'a version to increment'
+  path:
+    description: 'a path to a version file that contains the version to increment'
     required: true
   type:
     type: choice
     description: 'a sermver release type'
-    default: 'canary'
+    default: 'prerelease'
     required: true
     options:
       - prerelease
@@ -21,7 +21,7 @@ inputs:
       - major
   identifier:
     required: false
-    description: 'an identifier to be used to prefix version increment'
+    description: 'a identifier to be used to prefix version increment'
 
 outputs:
   version:

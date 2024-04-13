@@ -1,9 +1,16 @@
+import fs from 'node:fs'
+
 import * as core from '@actions/core'
 import { when } from 'jest-when'
 import semver from 'semver'
 
 import { run } from '../src/index'
 
+const path = 'VERSION.txt'
+
+let exists: jest.SpiedFunction<typeof fs.existsSync>
+let read: jest.SpiedFunction<typeof fs.promises.readFile>
+let write: jest.SpiedFunction<typeof fs.promises.writeFile>
 let input: jest.SpiedFunction<typeof core.getInput>
 let failed: jest.SpiedFunction<typeof core.setFailed>
 let output: jest.SpiedFunction<typeof core.setOutput>
@@ -20,17 +27,23 @@ describe('action', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
+    exists = jest.spyOn(fs, 'existsSync')
+    read = jest.spyOn(fs.promises, 'readFile')
+    write = jest.spyOn(fs.promises, 'writeFile')
     input = jest.spyOn(core, 'getInput')
     failed = jest.spyOn(core, 'setFailed')
     output = jest.spyOn(core, 'setOutput')
     inc = jest.spyOn(semver, 'inc')
 
-    when(input).calledWith('version').mockReturnValue('1.0.0')
+    when(exists).calledWith(path).mockReturnValue(true)
+    when(read).calledWith(path, 'utf-8').mockResolvedValue('1.0.0')
+    when(write).mockResolvedValue()
+    when(input).calledWith('path').mockReturnValue(path)
     when(input).calledWith('type').mockReturnValue('major')
     when(input).calledWith('identifier').mockReturnValue('')
   })
 
-  test('increments version number when no identifier provided', async () => {
+  test('outputs incremented version when no identifier provided', async () => {
     // act
     await run()
 
@@ -38,7 +51,7 @@ describe('action', () => {
     expect(output).toHaveBeenCalledWith('version', '2.0.0')
   })
 
-  test('increments version number when identifier provided', async () => {
+  test('outputs incremented version when identifier provided', async () => {
     // arrange
     when(input).calledWith('type').mockReturnValue('prerelease')
     when(input).calledWith('identifier').mockReturnValue('canary')
@@ -50,18 +63,25 @@ describe('action', () => {
     expect(output).toHaveBeenCalledWith('version', '1.0.1-canary.0')
   })
 
-  test('outputs version increment as a info message', async () => {
-    // arrange
-    const version = '1.0.0'
-    const info = jest.spyOn(core, 'info')
+  test('writes incremented version to version file', async () => {
+    // act
+    await run()
 
-    when(input).calledWith('version').mockReturnValue(version)
+    // assert
+    expect(write).toHaveBeenCalledWith(path, '2.0.0', 'utf-8')
+  })
+
+  test('fails when invalid path provided', async () => {
+    // arrange
+    const path = 'unknown.txt'
+
+    when(input).calledWith('path').mockReturnValue(path)
 
     // act
     await run()
 
     // assert
-    expect(info).toHaveBeenCalledWith(`incremented version from ${version} to 2.0.0`)
+    expect(failed).toHaveBeenCalledWith(`the file at path '${path}' cannot be found.`)
   })
 
   test('fails when invalid semver release type provided', async () => {
@@ -81,7 +101,7 @@ describe('action', () => {
     // arrange
     const version = 'bogus'
 
-    when(input).calledWith('version').mockReturnValue(version)
+    when(read).calledWith(path, 'utf-8').mockResolvedValueOnce(version)
 
     // act
     await run()

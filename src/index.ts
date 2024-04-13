@@ -1,9 +1,18 @@
+import fs from 'node:fs'
+
 import * as core from '@actions/core'
 import semver from 'semver'
 
 export const run = async () => {
   try {
-    const version = core.getInput('version')
+    const path = core.getInput('path')
+
+    if (!fs.existsSync(path)) {
+      core.setFailed(`the file at path '${path}' cannot be found.`)
+
+      return
+    }
+
     const type = core.getInput('type') as semver.ReleaseType
     const identifier = core.getInput('identifier')
 
@@ -13,6 +22,7 @@ export const run = async () => {
       return
     }
 
+    const version = (await fs.promises.readFile(path, 'utf-8')).trim()
     const output = semver.inc(version, type, identifier)
 
     if (output == null) {
@@ -21,8 +31,11 @@ export const run = async () => {
       return
     }
 
-    core.info(`incremented version from ${version} to ${output}`)
+    core.info(`version incremented from ${version} to ${output}`)
     core.setOutput('version', output)
+
+    await fs.promises.writeFile(path, output, 'utf-8')
+    core.info(`overwritten '${path}' contents to '${output}'`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
