@@ -1,4 +1,4 @@
-name: '@giantnodes/semver'
+name: 'giantnodes/semver'
 description: 'increments the semver from a version file'
 author: 'PHILLIPS71'
 
