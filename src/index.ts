@@ -32,10 +32,15 @@ export const run = async () => {
     }
 
     core.info(`version incremented from ${version} to ${output}`)
-    core.setOutput('version', output)
 
-    await fs.promises.writeFile(path, output, 'utf-8')
-    core.info(`overwritten '${path}' contents to '${output}'`)
+    const tag = identifier?.length > 0 ? identifier : 'latest'
+    const content = `${output}\n${tag}`
+
+    await fs.promises.writeFile(path, content, 'utf-8')
+    core.info(`overwritten '${path}' contents to '${content}'`)
+
+    core.setOutput('version', output)
+    core.setOutput('tag', tag)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

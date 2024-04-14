@@ -49,6 +49,7 @@ describe('action', () => {
 
     // assert
     expect(output).toHaveBeenCalledWith('version', '2.0.0')
+    expect(output).toHaveBeenCalledWith('tag', 'latest')
   })
 
   test('outputs incremented version when identifier provided', async () => {
@@ -61,14 +62,15 @@ describe('action', () => {
 
     // assert
     expect(output).toHaveBeenCalledWith('version', '1.0.1-canary.1')
+    expect(output).toHaveBeenCalledWith('tag', 'canary')
   })
 
-  test('writes incremented version to version file', async () => {
+  test('writes incremented version and tag to version file', async () => {
     // act
     await run()
 
     // assert
-    expect(write).toHaveBeenCalledWith(path, '2.0.0', 'utf-8')
+    expect(write).toHaveBeenCalledWith(path, '2.0.0\nlatest', 'utf-8')
   })
 
   test('fails when invalid path provided', async () => {
