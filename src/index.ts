@@ -22,7 +22,7 @@ export const run = async () => {
       return
     }
 
-    const version = (await fs.promises.readFile(path, 'utf-8')).trim()
+    const version = (await fs.promises.readFile(path, 'utf-8')).split('\n')[0].trim()
     const output = semver.inc(version, type, identifier, '1')
 
     if (output == null) {

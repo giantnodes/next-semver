@@ -36,7 +36,7 @@ describe('action', () => {
     inc = jest.spyOn(semver, 'inc')
 
     when(exists).calledWith(path).mockReturnValue(true)
-    when(read).calledWith(path, 'utf-8').mockResolvedValue('1.0.0')
+    when(read).calledWith(path, 'utf-8').mockResolvedValue('1.0.0\nlatest')
     when(write).mockResolvedValue()
     when(input).calledWith('path').mockReturnValue(path)
     when(input).calledWith('type').mockReturnValue('major')

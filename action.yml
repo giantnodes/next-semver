@@ -26,6 +26,8 @@ inputs:
 outputs:
   version:
     description: 'the incremented version'
+  tag:
+    description: 'the version tag, either latest or the identifier when provided'
 
 runs:
   using: node20
