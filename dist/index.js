@@ -21651,16 +21651,20 @@ var run = async () => {
       core.setFailed(`'${type}' is not a valid semver release type`);
       return;
     }
-    const version2 = (await import_node_fs.default.promises.readFile(path, "utf-8")).trim();
-    const output = import_semver.default.inc(version2, type, identifier);
+    const version2 = (await import_node_fs.default.promises.readFile(path, "utf-8")).split("\n")[0].trim();
+    const output = import_semver.default.inc(version2, type, identifier, "1");
     if (output == null) {
       core.setFailed(`'${version2}' is not a valid version number`);
       return;
     }
     core.info(`version incremented from ${version2} to ${output}`);
+    const tag = (identifier == null ? void 0 : identifier.length) > 0 ? identifier : "latest";
+    const content = `${output}
+${tag}`;
+    await import_node_fs.default.promises.writeFile(path, content, "utf-8");
+    core.info(`overwritten '${path}' contents to '${content}'`);
     core.setOutput("version", output);
-    await import_node_fs.default.promises.writeFile(path, output, "utf-8");
-    core.info(`overwritten '${path}' contents to '${output}'`);
+    core.setOutput("tag", tag);
   } catch (error) {
     if (error instanceof Error)
       core.setFailed(error.message);
