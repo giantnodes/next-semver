@@ -1,5 +1,4 @@
 name: '🚨️  '
-author: 'PHILLIPS71'
 
 runs:
   using: 'composite'
