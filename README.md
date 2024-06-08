@@ -203,7 +203,7 @@ jobs:
         uses: thomaseizinger/create-pull-request@master
         with:
           title: 'chore(release): v${{ needs.create-release.outputs.version }}'
-          labels: '🏷️ Release v${{ needs.create-release.outputs.version }}'
+          labels: '🏷️ Release'
           github_token: ${{ secrets.GITHUB_TOKEN }}
           head: release/${{ needs.create-release.outputs.version }}
           base: main
