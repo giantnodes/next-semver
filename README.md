@@ -44,17 +44,170 @@
 
 ## About The Project
 
+The `@giantnodes/next-semver` GitHub Action simplifies the process of incrementing the semantic version of your packages following the Semantic Versioning (SemVer) guidelines. This action is designed to automate version management for projects, ensuring consistency and accuracy in version tracking.
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Getting Started
+
+To start using `@giantnodes/next-semver`, you first need to create and commit a version file that the action can reference. In the following examples, we'll use `VERSION.txt` as our version file.
+
+For a new repository, if you don't have a version file yet, it should be defined as follows:
+
+```txt
+0.0.0
+latest
+```
+
+For an existing repository where you want to introduce `@giantnodes/next-semver` to increment versions going forward, you need to define the current version of your package along with the version identifier. For instance, if the latest version of your package is 12.4.5, the `VERSION.txt` should be:
+
+```txt
+12.4.5
+latest
+```
+
+### Inputs
+
+- **path**: specifies the file that tracks the version. This file should contain two lines:
+
+  1. The version number
+  2. The version type
+
+  examples of a `VERSION.txt` file:
+
+  ```txt
+  1.3.5
+  latest
+  ```
+
+  ```txt
+  1.0.0-canary.17
+  canary
+  ```
+
+- **type**: specifies the type of release being created. It can be one of the following:
+
+  - `major`
+  - `premajor`
+  - `minor`
+  - `preminor`
+  - `patch`
+  - `prepatch`
+  - `prerelease`
+
+- **identifier**: optional parameter used for prereleases, the identifier will be appended to the version as a prerelease identifier. For example, in `1.0.0-canary.17`, `canary` is the identifier.
+
+### Outputs
+
+- **version**: the incremented version that was generated.
+
+- **tag**: for prereleases, this will match the provided release identifier. If no identifier is provided, it will default to latest.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Usage
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+Below is a comprehensive workflow example demonstrating how to use `@giantnodes/next-semver` alongside other action steps. Your workflow may vary, but this serves as a good illustration.
 
-## Roadmap
+In this example, `@giantnodes/next-semver` is used to create a new version of a Node.js package and update a .NET NuGet package. We then check out a release branch, push the updated `VERSION.txt` file, versioned Node.js and NuGet packages, and create a tagged GitHub release. Finally, a pull request is raised from the release branch back to the main branch to merge the freshly versioned packages and `VERSION.txt` file.
+
+```yml
+name: '🏷️  Release'
+
+on:
+  workflow_dispatch:
+    inputs:
+      type:
+        type: choice
+        description: 'SemVer Increment'
+        default: 'prerelease'
+        required: true
+        options:
+          - prerelease
+          - prepatch
+          - patch
+          - preminor
+          - minor
+          - premajor
+          - major
+      identifier:
+        type: choice
+        description: 'PreRelease Identifier'
+        options:
+          - canary
+
+jobs:
+  create-release:
+    # increment the version defined in the root VERSION.txt file
+    - name: '🏷️  Increment Version'
+      id: version
+      uses: giantnodes/next-semver@1.0.0
+      with:
+        path: VERSION.txt
+        type: ${{ inputs.RELEASE_TYPE }}
+        identifier: ${{ inputs.RELEASE_IDENTIFIER }}
+
+    # version a NPM package...
+    - name: '🏷️  Version @giantnodes/design-system'
+      shell: bash
+      run: |
+        pnpm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+    # or Version Nuget packages...
+    - name: '⬇️  Install (dotnet-setversion)'
+      shell: bash
+      run: |
+        dotnet tool install -g dotnet-setversion
+
+    - name: '🏷️  Version (infrastructure)'
+      working-directory: ./src/Infrastructure
+      shell: bash
+      run: |
+        setversion --recursive ${{ steps.version.outputs.version }}
+
+    # configure Git account that will create a release
+    - name: '🏷️  Configure Git'
+      shell: bash
+      run: |
+        git config --global user.name 'giantnodes-bot'
+        git config --global user.email 'bot@giantnodes.com'
+
+    # checkout a release branch and create a github release
+    - name: '🏷️  Tag, Commit & Release'
+      id: branch
+      shell: bash
+      run: |
+        git checkout -b release/${{ steps.version.outputs.version }}
+        git commit -anm 'chore(release): v${{ steps.version.outputs.version }}'
+        git push origin release/${{ steps.version.outputs.version }}
+
+        gh release create v${{ steps.version.outputs.version }} ${{ steps.version.outputs.tag == 'latest' && '--latest' || '--prerelease' }} --generate-notes
+
+        echo "branch=$(git branch --show-current)" >> $GITHUB_OUTPUT
+      env:
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+
+  pull-request:
+    name: '🏷️  Open Pull Request'
+    runs-on: ubuntu-latest
+    needs: [create-release]
+    steps:
+      # checkout our newly created release branch
+      - name: '🐙️  Checkout'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.create-release.outputs.branch }}
+
+      # raise a PR to the main branch so versions are updated
+      - name: '🏷️  Open Pull Request'
+        uses: thomaseizinger/create-pull-request@master
+        with:
+          title: 'chore(release): v${{ needs.create-release.outputs.version }}'
+          labels: '🏷️ Release v${{ needs.create-release.outputs.version }}'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          head: release/${{ needs.create-release.outputs.version }}
+          base: main
+```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
