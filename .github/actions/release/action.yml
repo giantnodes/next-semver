@@ -1,19 +1,53 @@
 name: '🏷️  '
-author: 'PHILLIPS71'
 
 inputs:
-  GH_TOKEN:
+  GITHUB_TOKEN:
     required: true
-  NPM_TOKEN:
+  RELEASE_TYPE:
     required: true
+  RELEASE_IDENTIFIER:
+    required: false
+
+outputs:
+  version:
+    value: ${{ steps.version.outputs.version }}
+  tag:
+    value: ${{ steps.version.outputs.tag }}
+  branch:
+    value: ${{ steps.branch.outputs.branch }}
 
 runs:
   using: 'composite'
   steps:
-    - name: '🏷️  Release'
+    - name: '🏷️  Increment Release'
+      id: version
+      uses: ./
+      with:
+        path: VERSION.txt
+        type: ${{ inputs.RELEASE_TYPE }}
+        identifier: ${{ inputs.RELEASE_IDENTIFIER }}
+
+    - name: '🏷️  Version @giantnodes/next-semver'
       shell: bash
-      env:
-        GH_TOKEN: ${{ inputs.GH_TOKEN }}
-        NPM_TOKEN: ${{ inputs.NPM_TOKEN }}
       run: |
-        pnpm run semantic-release
+        pnpm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
+    - name: '🏷️  Configure Git'
+      shell: bash
+      run: |
+        git config --global user.name 'giantnodes-bot'
+        git config --global user.email 'bot@giantnodes.com'
+
+    - name: '🏷️  Tag, Commit & Release'
+      shell: bash
+      id: branch
+      run: |
+        git checkout -b release/${{ steps.version.outputs.version }}
+        git commit -anm 'chore(release): v${{ steps.version.outputs.version }}'
+        git push origin release/${{ steps.version.outputs.version }}
+
+        gh release create v${{ steps.version.outputs.version }} ${{ steps.version.outputs.tag == 'latest' && '--latest' || '--prerelease' }} --generate-notes
+
+        echo "branch=$(git branch --show-current)" >> $GITHUB_OUTPUT
+      env:
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}

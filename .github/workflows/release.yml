@@ -1,0 +1,83 @@
+name: '🏷️  Release'
+
+on:
+  workflow_dispatch:
+    inputs:
+      type:
+        type: choice
+        description: 'SemVer Increment'
+        default: 'prerelease'
+        required: true
+        options:
+          - prerelease
+          - prepatch
+          - patch
+          - preminor
+          - minor
+          - premajor
+          - major
+
+jobs:
+  create-release:
+    name: '🏷️  Create Release'
+    runs-on: ubuntu-latest
+    steps:
+      - name: '🐙️  Checkout'
+        uses: actions/checkout@v4
+
+      - name: '💽️  Setup'
+        uses: ./.github/actions/init
+
+      - name: '🔺️  Cache'
+        uses: ./.github/actions/cache
+
+      - name: '📦  Install'
+        uses: ./.github/actions/install
+
+      - name: '🏗️  Build'
+        uses: ./.github/actions/build
+        with:
+          COMMAND: 'build'
+
+      - name: '🚨️  Lint'
+        uses: ./.github/actions/lint
+
+      - name: '🦺  Type Check'
+        uses: ./.github/actions/type-check
+        with:
+          COMMAND: 'type-check'
+
+      - name: '🧪  Test'
+        uses: ./.github/actions/test
+        with:
+          COMMAND: 'test'
+
+      - name: '🏷️  Release'
+        id: release
+        uses: ./.github/actions/release
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TYPE: ${{ github.event.inputs.type }}
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      tag: ${{ steps.release.outputs.tag }}
+      branch: ${{ steps.release.outputs.branch }}
+
+  pull-request:
+    name: '🏷️  Open Pull Request'
+    runs-on: ubuntu-latest
+    needs: [create-release]
+    steps:
+      - name: '🐙️  Checkout'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.create-release.outputs.branch }}
+
+      - name: '🏷️  Open Pull Request'
+        uses: thomaseizinger/create-pull-request@master
+        with:
+          title: 'chore(release): v${{ needs.create-release.outputs.version }}'
+          labels: '🏷️ Release v${{ needs.create-release.outputs.version }}'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          head: release/${{ needs.create-release.outputs.version }}
+          base: main
