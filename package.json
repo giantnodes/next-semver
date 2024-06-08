@@ -1,6 +1,6 @@
 {
   "name": "@giantnodes/next-semver",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A Github action to increment a semver",
   "license": "MIT",
   "packageManager": "pnpm@8.7.0",
