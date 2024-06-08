@@ -54,6 +54,7 @@ describe('action', () => {
 
   test('outputs incremented version when identifier provided', async () => {
     // arrange
+    when(read).calledWith(path, 'utf-8').mockResolvedValue('1.0.0-canary.1\ncanary')
     when(input).calledWith('type').mockReturnValue('prerelease')
     when(input).calledWith('identifier').mockReturnValue('canary')
 
@@ -61,7 +62,7 @@ describe('action', () => {
     await run()
 
     // assert
-    expect(output).toHaveBeenCalledWith('version', '1.0.1-canary.1')
+    expect(output).toHaveBeenCalledWith('version', '1.0.0-canary.2')
     expect(output).toHaveBeenCalledWith('tag', 'canary')
   })
 

@@ -1,9 +1,7 @@
-name: '▶️  Pull'
+name: '▶️  Pull Request'
 
 on:
-  pull_request_target:
-    branches:
-      - main
+  pull_request:
 
 concurrency:
   group: pull-request-${{ github.event.pull_request.number }}
@@ -21,7 +19,7 @@ jobs:
       - name: '🐙️  Checkout'
         uses: actions/checkout@v4
 
-      - name: '💽️  Init'
+      - name: '💽️  Setup'
         uses: ./.github/actions/init
 
       - name: '📦  Install'
